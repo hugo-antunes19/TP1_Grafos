@@ -1,61 +1,35 @@
+#include <bits/stdc++.h>
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
-#include <vector>
+using namespace std;
 
 int main() {
     // Abrir o arquivo
-    std::ifstream inputFile("example.txt");
+    ifstream file("grafos_2.txt");
 
-    // checar se o arquivo está abrindo
-    if (!inputFile.is_open()) {
-        std::cerr << "Não conseguimos abrir o arquivo =[" << std::endl;
+    // Checar se o file está abrindo
+    if (!file.is_open()) {
+        cout << "Não conseguimos abrir o arquivo =[" << endl;
         return 1;
     }
+    long long vertices;
+    file >> vertices;
+    vector<vector< long long>> listAdj(vertices+1); // Cria vetor de vetores
+    vector<vector< long long>> matrizAdj(vertices+1);
+    long long x, y, arestas;
 
-    // ler o arquivo linha por linha
-    std::string line;
-    int i = 0;
-    std::vector< int > esq; // o array esq contém todos os números da coluna da esquerda
-    std::vector< int > dir; // o array dir os da direita
-    while (std::getline(inputFile, line)) { // percorrer as linhas do arquivo
-
-        // primeira linha possui a quantidade de vértices
-        if (i == 0){
-            std::stringstream ss(line);
-            int vertices;
-            ss >> vertices;
-        }
-
-        // esse else e while separam os números do input file
-        else{
-            std::string numberStr; // string para armazenar o número em string
-            size_t x = 0;
-        while (x < line.length()) { // percorrer os caracteres das linhas
-            if (line[x] == '\t' || line[x] == ' ') { // teremos apenas duas colunas por linha, separadas por tab ou espaço
-                std::stringstream ss(numberStr); // transformar string em inteiro
-                int number;
-                ss >> number;
-                esq.push_back(number); // colocando o inteiro na lista
-                numberStr = "";
-            }
-            numberStr += line[x];
-            if (x == line.length() - 1) { // a coluna da direita acaba quando i chega no seu valor máximo
-                std::stringstream ss(numberStr);
-                int number;
-                ss >> number;
-                dir.push_back(number);
-                numberStr = "";
-            }
-            x = x+1;
-        }
-    }
-        i = i+1;
+    while (file >> x >> y) { // Atribui os inteiros das colunas para cada variável (x e y)
+        listAdj[x].push_back(y); // Adiciona na Lista de Adjacência
+        listAdj[y].push_back(x);
+        matrizAdj[x][y] = 1; // Adiciona na Matriz de Adjacência
+        matrizAdj[y][x] = 1;
+        arestas++;
     }
 
-    // fechar o arquivo
-    inputFile.close();
+
+    // Fechar o arquivo
+    file.close();
 
     return 0;
 }
