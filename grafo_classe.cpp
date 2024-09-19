@@ -3,7 +3,8 @@
 #include <getopt.h>
 #include <fstream>
 #include <sstream>
-#include <queue> // Para BFS
+#include <queue> 
+#include <chrono>
 using namespace std;
 
 class Grafo {
@@ -11,16 +12,23 @@ private:
     vector<vector<long long>> matrizAdj;
     vector<vector<long long>> listAdj;
     long long vertices;
+    long long arestas;
     bool usaMatriz;
+    vector<bool> visitado;
+    vector<long long> pai;
+    vector<long long> nivel;
 
 public:
-    Grafo(long long v, bool isMatriz) : vertices(v), usaMatriz(isMatriz) {
+    Grafo(long long v, bool isMatriz) : vertices(v), usaMatriz(isMatriz), visitado(vertices + 1, false), 
+    pai(vertices + 1, -1), nivel(vertices + 1, -1) {
+
         if (usaMatriz) {
             matrizAdj.resize(vertices + 1, vector<long long>(vertices + 1, 0));
         } else {
             listAdj.resize(vertices + 1);
         }
     }
+    
 
     // Adiciona uma aresta ao grafo
     void adicionarAresta(long long x, long long y) {
@@ -54,19 +62,29 @@ public:
         }
     }
 
-    // Algoritmo BFS
-    void BFS(long long s, const string& outputFile) {
-        vector<bool> visitado(vertices + 1, false);
-        vector<long long> pai(vertices + 1, -1);
-        vector<long long> nivel(vertices + 1, -1);
-        queue<long long> Q;
-
+    //escrever em arquivo (para retornar a arvore gerada por busca)
+    void Write_file_busca(vector<long long> pai,vector<long long> nivel, const string& outputFile, long long s){
         ofstream outFile(outputFile);
         if (!outFile.is_open()) {
             cerr << "Erro ao abrir arquivo de saída." << endl;
             return;
         }
-        outFile << "Busca em Profundidade (DFS)\n";
+        outFile << "Árvore gerada por busca\n";
+
+        for (long long v = 1; v <= vertices; v++)
+        if (pai[v] != -1 || v == s) {
+            outFile << "Vértice: " << v << ", Pai: " << pai[v] << ", Nível: " << nivel[v] << endl;
+           }
+        outFile.close();
+    }
+
+    // Algoritmo BFS
+    void BFS(long long s, const string& outputFile, bool write_tree) {
+        visitado.assign(vertices + 1, false);
+        pai.assign(vertices + 1, -1);
+        nivel.assign(vertices + 1, -1);
+
+        queue<long long> Q;
         
         visitado[s] = true;
         nivel[s] = 0;
@@ -75,11 +93,6 @@ public:
         while (!Q.empty()) {
             long long v = Q.front();
             Q.pop();
-            
-            // Escreve no arquivo imediatamente ao visitar o vértice
-            if (pai[v] != -1 || v == s) {
-                outFile << "Vértice: " << v << ", Pai: " << pai[v] << ", Nível: " << nivel[v] << endl;
-            }
 
             const vector<long long>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
             for (long long w : vizinhos) {
@@ -91,24 +104,19 @@ public:
                 }
             }
         }
+        if (write_tree){
+            Write_file_busca(pai, nivel, outputFile, s);
+        }
 
-        outFile.close();
     }
 
-    void DFS(long long s, const string& outputFile) {
-        vector<bool> visitado(vertices + 1, false);
-        vector<long long> pai(vertices + 1, -1);
-        vector<long long> nivel(vertices + 1, -1);
+    void DFS(long long s, const string& outputFile, bool write_tree) {
+        visitado.assign(vertices + 1, false);
+        pai.assign(vertices + 1, -1);
+        nivel.assign(vertices + 1, -1);
+
         stack<long long> pilha;
 
-        ofstream outFile(outputFile);
-        if (!outFile.is_open()) {
-            cerr << "Erro ao abrir arquivo de saída." << endl;
-            return;
-        }
-        outFile << "Busca em Profundidade (DFS)\n";
-
-        // Inicialmente, marca o vértice de origem
         pilha.push(s);
         nivel[s] = 0;
 
@@ -118,11 +126,6 @@ public:
 
             if (!visitado[v]) {
                 visitado[v] = true;
-
-                // Escreve no arquivo imediatamente ao visitar o vértice
-                if (pai[v] != -1 || v == s) {
-                    outFile << "Vértice: " << v << ", Pai: " << pai[v] << ", Nível: " << nivel[v] << endl;
-                }
 
                 // Para cada vizinho do vértice v
                 const vector<long long>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
@@ -135,8 +138,10 @@ public:
                 }
             }
         }
+        if (write_tree){
+            Write_file_busca(pai, nivel, outputFile, s);
+        }
 
-        outFile.close();
     }
 
     // Obtém os vizinhos de um vértice na matriz de adjacência
@@ -155,14 +160,20 @@ int main(int argc, char *argv[]) {
     // Variáveis para capturar as opções
     int opt;
     string inputFile, outputFile, option; // Matriz ou Lista
+    string timeFile; // Arquivo para salvar o tempo de execução
+    string first_vertice, useMatrix;
+
     struct option long_options[] = {
         {"file", required_argument, 0, 'f'},
         {"output", required_argument, 0, 'u'},
         {"option", required_argument, 0, 'o'},
+        {"time", required_argument, 0, 't'},
+        {"inicial", required_argument, 0, 's'},
+        {"useMatrix", required_argument, 0, 'm'},
         {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "f:u:o:", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "f:u:o:t:s", long_options, NULL)) != -1) {
         switch (opt) {
             case 'f':
                 inputFile = optarg;
@@ -172,6 +183,15 @@ int main(int argc, char *argv[]) {
                 break;
             case 'o':
                 option = optarg;
+                break;
+            case 't':
+                timeFile = optarg;
+                break;
+            case 's':
+                first_vertice = optarg;
+                break;
+            case 'm':
+                useMatrix = optarg;
                 break;
         }
     }
@@ -188,30 +208,54 @@ int main(int argc, char *argv[]) {
     }
 
     long long vertices;
+    long long arestas = 0;
     file >> vertices;
 
-    bool usaMatriz = (option == "matriz");
+    bool usaMatriz = (useMatrix == "matriz");
     Grafo grafo(vertices, usaMatriz);
 
     long long x, y;
     while (file >> x >> y) {
         if (x <= vertices && y <= vertices) {
             grafo.adicionarAresta(x, y);
+            arestas++;
         }
     }
 
-    // Executa BFS ou DFS a partir do vértice 1 (pode ser alterado conforme necessidade)
-    if (option == "bfs") {
-        grafo.BFS(1, outputFile);
-    } else if (option == "dfs") {
-        grafo.DFS(1, outputFile);
-    } else {
-        cerr << "Opção inválida. Use 'bfs' ou 'dfs'." << endl;
+    ofstream timeOutFile(timeFile, ios::app);
+    if (!timeOutFile.is_open()) {
+        cerr << "Erro ao abrir arquivo de tempo de execução." << endl;
+        return 1;
     }
 
+    long long s = stoll(first_vertice);
+    // Executa BFS ou DFS a partir do vértice 1 (pode ser alterado conforme necessidade)
+    if (option == "bfs") {
+
+        auto inicio = chrono::high_resolution_clock::now(); // Início do tempo
+        grafo.BFS(s, outputFile, false);
+        auto fim = chrono::high_resolution_clock::now(); // Fim do tempo
+        chrono::duration<double> duracao = fim - inicio;
+        timeOutFile << fixed << setprecision(6) << duracao.count() << " s= " << s << endl;
+
+    } else if (option == "dfs") {
+
+        auto inicio = chrono::high_resolution_clock::now(); // Início do tempo
+        grafo.DFS(s, outputFile, false);
+        auto fim = chrono::high_resolution_clock::now(); // Fim do tempo
+        chrono::duration<double> duracao = fim - inicio;
+        timeOutFile << fixed << setprecision(6) << duracao.count() << " s= " << s << endl;
+
+    } else {
+        cerr << "Opção inválida. Use 'bfs' ou 'dfs'." << endl;
+        return 1;
+    }
+
+    timeOutFile.close();
     file.close();
     return 0;
 }
+
 
 
 // g++ seu_codigo.cpp -o seu_programa
