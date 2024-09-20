@@ -159,21 +159,20 @@ public:
 int main(int argc, char *argv[]) {
     // Variáveis para capturar as opções
     int opt;
-    string inputFile, outputFile, option; // Matriz ou Lista
-    string timeFile; // Arquivo para salvar o tempo de execução
-    string first_vertice, useMatrix;
+    string inputFile, outputFile, timeFile_bfs; 
+    string timeFile_dfs; // Arquivo para salvar o tempo de execução
+    string useMatrix; // Matriz ou Lista
 
     struct option long_options[] = {
         {"file", required_argument, 0, 'f'},
         {"output", required_argument, 0, 'u'},
-        {"option", required_argument, 0, 'o'},
-        {"time", required_argument, 0, 't'},
-        {"inicial", required_argument, 0, 's'},
+        {"timeFile_bfs", required_argument, 0, 'o'},
+        {"timeFile_dfs", required_argument, 0, 't'},
         {"useMatrix", required_argument, 0, 'm'},
         {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "f:u:o:t:s", long_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "f:u:o:t:m", long_options, NULL)) != -1) {
         switch (opt) {
             case 'f':
                 inputFile = optarg;
@@ -182,13 +181,10 @@ int main(int argc, char *argv[]) {
                 outputFile = optarg;
                 break;
             case 'o':
-                option = optarg;
+                timeFile_bfs = optarg;
                 break;
             case 't':
-                timeFile = optarg;
-                break;
-            case 's':
-                first_vertice = optarg;
+                timeFile_dfs = optarg;
                 break;
             case 'm':
                 useMatrix = optarg;
@@ -196,7 +192,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (inputFile.empty() || option.empty() || outputFile.empty()) {
+    if (inputFile.empty() || timeFile_bfs.empty() || outputFile.empty()) {
         cerr << "Uso: " << argv[0] << " --file <inputfile> --output <outputfile> --option <option>" << endl;
         return 1;
     }
@@ -222,36 +218,47 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    ofstream timeOutFile(timeFile, ios::app);
-    if (!timeOutFile.is_open()) {
-        cerr << "Erro ao abrir arquivo de tempo de execução." << endl;
+    ofstream timeOutFile_bfs(timeFile_bfs, ios::app);
+    if (!timeOutFile_bfs.is_open()) {
+        cerr << "Erro ao abrir arquivo de tempo de execução bfs." << endl;
         return 1;
     }
 
-    long long s = stoll(first_vertice);
-    // Executa BFS ou DFS a partir do vértice 1 (pode ser alterado conforme necessidade)
-    if (option == "bfs") {
-
-        auto inicio = chrono::high_resolution_clock::now(); // Início do tempo
-        grafo.BFS(s, outputFile, false);
-        auto fim = chrono::high_resolution_clock::now(); // Fim do tempo
-        chrono::duration<double> duracao = fim - inicio;
-        timeOutFile << fixed << setprecision(6) << duracao.count() << " s= " << s << endl;
-
-    } else if (option == "dfs") {
-
-        auto inicio = chrono::high_resolution_clock::now(); // Início do tempo
-        grafo.DFS(s, outputFile, false);
-        auto fim = chrono::high_resolution_clock::now(); // Fim do tempo
-        chrono::duration<double> duracao = fim - inicio;
-        timeOutFile << fixed << setprecision(6) << duracao.count() << " s= " << s << endl;
-
-    } else {
-        cerr << "Opção inválida. Use 'bfs' ou 'dfs'." << endl;
+    ofstream timeOutFile_dfs(timeFile_dfs, ios::app);
+    if (!timeOutFile_dfs.is_open()) {
+        cerr << "Erro ao abrir arquivo de tempo de execução dfs." << endl;
         return 1;
     }
 
-    timeOutFile.close();
+    // Inicializa o gerador de números aleatórios com um seed (semente)
+    random_device rd;  
+    mt19937 gen(rd()); // Gerador de números aleatórios Mersenne Twister
+    
+    // Define a distribuição de números (neste caso, inteiros entre 1 e vertices)
+    uniform_int_distribution<> distrib(1, vertices);
+
+    for (int n = 1; n <= 100; n++){
+
+        long long random_number = distrib(gen);
+
+        auto inicio_bfs = chrono::high_resolution_clock::now(); // Início do tempo
+        grafo.BFS(random_number, outputFile, false);
+        auto fim_bfs = chrono::high_resolution_clock::now(); // Fim do tempo
+        chrono::duration<double> duracao_bfs = fim_bfs - inicio_bfs;
+        timeOutFile_bfs << fixed << setprecision(6) << duracao_bfs.count() << " s= " << random_number << endl;
+
+
+        auto inicio_dfs = chrono::high_resolution_clock::now(); // Início do tempo
+        grafo.DFS(random_number, outputFile, false);
+        auto fim_dfs = chrono::high_resolution_clock::now(); // Fim do tempo
+        chrono::duration<double> duracao_dfs = fim_dfs - inicio_dfs;
+        timeOutFile_dfs << fixed << setprecision(6) << duracao_dfs.count() << " s= " << random_number << endl;
+
+    }
+
+
+    timeOutFile_bfs.close();
+    timeOutFile_dfs.close();
     file.close();
     return 0;
 }
