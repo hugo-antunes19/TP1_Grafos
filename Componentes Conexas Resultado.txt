@@ -1,0 +1,42 @@
+Grafos: 
+1:
+Componentes de tamanho 10000:
+Numero de Componentes Conexas: 1
+2:
+Componentes de tamanho 25000:
+Componentes de tamanho 12500:
+Componentes de tamanho 6250:
+Componentes de tamanho 3125:
+Componentes de tamanho 1562:
+Componentes de tamanho 781:
+Componentes de tamanho 390:
+Componentes de tamanho 195:
+Componentes de tamanho 97:
+Componentes de tamanho 48:
+Numero de Componentes Conexas: 10
+3:
+Componentes de tamanho 250000:
+Componentes de tamanho 125000:
+Numero de Componentes Conexas: 2
+
+4:
+Componentes de tamanho 250000:
+Componentes de tamanho 125000:
+Numero de Componentes Conexas: 2
+
+5:
+Componentes de tamanho 2500000:
+Componentes de tamanho 1250000:
+Componentes de tamanho 625000:
+Componentes de tamanho 312500:
+Componentes de tamanho 156250:
+Numero de Componentes Conexas: 5
+
+6:
+
+Componentes de tamanho 2500000:
+Componentes de tamanho 1250000:
+Componentes de tamanho 625000:
+Componentes de tamanho 312500:
+Componentes de tamanho 156250:
+Numero de Componentes Conexas: 5
