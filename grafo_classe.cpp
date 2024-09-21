@@ -9,29 +9,32 @@ using namespace std;
 
 class Grafo {
 private:
-    vector<vector<long long>> matrizAdj;
-    vector<vector<long long>> listAdj;
-    long long vertices;
-    long long arestas;
+    vector<vector<bool>> matrizAdj;
+    vector<vector<unsigned int>> listAdj;
+    unsigned int vertices;
+    unsigned int arestas;
     bool usaMatriz;
     vector<bool> visitado;
-    vector<long long> pai;
-    vector<long long> nivel;
+    vector<unsigned int> pai;
+    vector<unsigned int> nivel;
+    unsigned int n_CompConexa; 
+
 
 public:
-    Grafo(long long v, bool isMatriz) : vertices(v), usaMatriz(isMatriz), visitado(vertices + 1, false), 
+
+
+    Grafo(unsigned int v, bool isMatriz) : vertices(v), usaMatriz(isMatriz), visitado(vertices + 1, false), 
     pai(vertices + 1, -1), nivel(vertices + 1, -1) {
 
         if (usaMatriz) {
-            matrizAdj.resize(vertices + 1, vector<long long>(vertices + 1, 0));
+            matrizAdj.resize(vertices + 1, vector<bool>(vertices + 1, 0));
         } else {
             listAdj.resize(vertices + 1);
         }
     }
-    
 
     // Adiciona uma aresta ao grafo
-    void adicionarAresta(long long x, long long y) {
+    void adicionarAresta(unsigned int x, unsigned int y) {
         if (usaMatriz) {
             matrizAdj[x][y] = 1;
             matrizAdj[y][x] = 1;
@@ -63,7 +66,7 @@ public:
     }
 
     //escrever em arquivo (para retornar a arvore gerada por busca)
-    void Write_file_busca(vector<long long> pai,vector<long long> nivel, const string& outputFile, long long s){
+    void Write_file_busca(vector<unsigned int> pai,vector<unsigned int> nivel, const string& outputFile, unsigned int s){
         ofstream outFile(outputFile);
         if (!outFile.is_open()) {
             cerr << "Erro ao abrir arquivo de saída." << endl;
@@ -71,31 +74,42 @@ public:
         }
         outFile << "Árvore gerada por busca\n";
 
-        for (long long v = 1; v <= vertices; v++)
+        for (unsigned int v = 1; v <= vertices; v++)
         if (pai[v] != -1 || v == s) {
             outFile << "Vértice: " << v << ", Pai: " << pai[v] << ", Nível: " << nivel[v] << endl;
            }
         outFile.close();
     }
 
+    // Obtém os vizinhos de um vértice na matriz de adjacência
+    vector<unsigned int> getVizinhosMatriz(unsigned int v) const {
+        vector<unsigned int> vizinhos;
+        for (unsigned int i = 1; i <= vertices; ++i) {
+            if (matrizAdj[v][i] == 1) {
+                vizinhos.push_back(i);
+            }
+        }
+        return vizinhos;
+    }
+
     // Algoritmo BFS
-    void BFS(long long s, const string& outputFile, bool write_tree) {
+    void BFS(unsigned int s, const string& outputFile, bool write_tree) {
         visitado.assign(vertices + 1, false);
         pai.assign(vertices + 1, -1);
         nivel.assign(vertices + 1, -1);
 
-        queue<long long> Q;
+        queue<unsigned int> Q;
         
         visitado[s] = true;
         nivel[s] = 0;
         Q.push(s);
 
         while (!Q.empty()) {
-            long long v = Q.front();
+            unsigned int v = Q.front();
             Q.pop();
 
-            const vector<long long>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
-            for (long long w : vizinhos) {
+            const vector<unsigned int>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
+            for (unsigned int w : vizinhos) {
                 if (!visitado[w]) {
                     visitado[w] = true;
                     pai[w] = v;      // Armazena o pai de w
@@ -107,29 +121,28 @@ public:
         if (write_tree){
             Write_file_busca(pai, nivel, outputFile, s);
         }
-
     }
 
-    void DFS(long long s, const string& outputFile, bool write_tree) {
+    void DFS(unsigned int s, const string& outputFile, bool write_tree) {
         visitado.assign(vertices + 1, false);
         pai.assign(vertices + 1, -1);
         nivel.assign(vertices + 1, -1);
 
-        stack<long long> pilha;
+        stack<unsigned int> pilha;
 
         pilha.push(s);
         nivel[s] = 0;
 
         while (!pilha.empty()) {
-            long long v = pilha.top();
+            unsigned int v = pilha.top();
             pilha.pop();
 
             if (!visitado[v]) {
                 visitado[v] = true;
 
                 // Para cada vizinho do vértice v
-                const vector<long long>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
-                for (long long w : vizinhos) {
+                const vector<unsigned int>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
+                for (unsigned int w : vizinhos) {
                     if (!visitado[w]) {
                         pilha.push(w);
                         pai[w] = v;           // Define o pai de w
@@ -141,20 +154,51 @@ public:
         if (write_tree){
             Write_file_busca(pai, nivel, outputFile, s);
         }
-
     }
 
-    // Obtém os vizinhos de um vértice na matriz de adjacência
-    vector<long long> getVizinhosMatriz(long long v) const {
-        vector<long long> vizinhos;
-        for (long long i = 1; i <= vertices; ++i) {
-            if (matrizAdj[v][i] == 1) {
-                vizinhos.push_back(i);
+    map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> ComponentesConexas() {   
+        // Mapa onde a chave é o tamanho da componente e os valores são os vértices da componente
+        map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> componentesConexas;
+        vector<bool> visitado(vertices + 1, false); // Vetor para marcar vértices visitados
+        queue<unsigned int> Q; // Fila para a BFS
+
+        // Percorre todos os vértices do grafo
+        for (unsigned int i = 1; i <= vertices; ++i) {
+            if (!visitado[i]) {
+                // Se o vértice ainda não foi visitado, achamos uma nova componente conexa
+                vector<unsigned int> componenteAtual; // Armazena os vértices da componente atual
+                n_CompConexa ++;
+                // Executa a BFS a partir do vértice 'i'
+                Q.push(i);
+                visitado[i] = true;
+
+                while (!Q.empty()) {
+                    unsigned int v = Q.front();
+                    Q.pop();
+
+                    componenteAtual.push_back(v); // Adiciona o vértice à componente atual
+
+                    const vector<unsigned int>& vizinhos = usaMatriz ? getVizinhosMatriz(v) : listAdj[v];
+                    for (unsigned int w : vizinhos) {
+                        if (!visitado[w]) {
+                            visitado[w] = true;
+                            Q.push(w);
+                        }
+                    }
+                }
+
+                // Adiciona a componente atual ao mapa, usando o tamanho da componente como chave
+                unsigned int tamanho = componenteAtual.size();
+                componentesConexas[tamanho].push_back(componenteAtual); 
             }
         }
-        return vizinhos;
+
+        return componentesConexas; // Retorna o mapa de componentes
     }
+
+
 };
+
 
 int main(int argc, char *argv[]) {
     // Variáveis para capturar as opções
@@ -203,14 +247,14 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    long long vertices;
-    long long arestas = 0;
+    unsigned int vertices;
+    unsigned int arestas = 0;
     file >> vertices;
 
     bool usaMatriz = (useMatrix == "matriz");
     Grafo grafo(vertices, usaMatriz);
 
-    long long x, y;
+    unsigned int x, y;
     while (file >> x >> y) {
         if (x <= vertices && y <= vertices) {
             grafo.adicionarAresta(x, y);
@@ -239,7 +283,7 @@ int main(int argc, char *argv[]) {
 
     for (int n = 1; n <= 100; n++){
 
-        long long random_number = distrib(gen);
+        unsigned int random_number = distrib(gen);
 
         auto inicio_bfs = chrono::high_resolution_clock::now(); // Início do tempo
         grafo.BFS(random_number, outputFile, false);
