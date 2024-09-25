@@ -1,30 +1,40 @@
-Esse é o TP da disciplina de Grafos de 2024.2
+Trabalho Prático de Grafos - 2024.2
 Alunos responsáveis: Hugo Antunes e Vivian Souza
 
-O nosso trabalho foi inteiramente feito em c++, sendo separado em 3 arquivos que precisam ser baixados para a devida importação da biblioteca.
-O arquivo graph.h é o cabeçalho da classe, graph.cpp é a implementação dos métodos da classe e o main.cpp é a utilização da biblioteca diretamente, onde foram realizados os testes.
-Favor prestar atenção na importação feita, uma vez que isso impacta diretamente no uso da nossa biblioteca 'graph'.
+Descrição
+Este é o Trabalho Prático (TP) da disciplina de Grafos de 2024.2. O projeto foi inteiramente desenvolvido em C++ e está organizado em três arquivos principais:
 
-Para compilar a nossa biblioteca, sugerimos os seguintes comandos (em linux).
+graph.h: Cabeçalho da classe.
+graph.cpp: Implementação dos métodos da classe.
+main.cpp: Utilização da biblioteca e realização dos testes.
+Instruções de Compilação e Execução
+Para compilar e executar a biblioteca, siga os passos abaixo (em Linux):
 
-1- Entrar no diretório onde está localizado os arquivos graph.h, graph.cpp e main.pp
-  cd ./path/
+Entrar no diretório onde estão localizados os arquivos graph.h, graph.cpp e main.cpp:
+cd ./path/
 
-2- Compilar o arquivo (fizemos utilizando a otimização O3)
-  g++ -O3 -o a.exe main.cpp graph.cpp
+Compilar os arquivos (utilizando a otimização O3):
+g++ -O3 -o a.exe main.cpp graph.cpp
 
-3- Rodar o executável (que chamamos de a.exe)
-  ./a.exe
+Executar o programa:
+./a.exe
 
+Exemplos de Uso
+Calcular e Imprimir Componentes Conexas
+O código abaixo mostra como calcular e imprimir as componentes conexas do grafo:
 
-Exemplo de como calcular e imprimir componentes conexas (código utilizado para obter os resultados dos experimentos)
+Grafo grafo("grafo_1.txt", usaMatriz); // O primeiro argumento é alterado de acordo com o grafo que se deseja utilizar
 
-Grafo grafo(grafo_1.txt, usaMatriz) primeiro termo é alterado de acordo com o grafo que se deseja utilizar
-
-map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> Comp_do_Grafo = grafo.ComponentesConexas();
+std::map<unsigned int, std::vector<std::vector<unsigned int>>, std::greater<unsigned int>> Comp_do_Grafo = grafo.ComponentesConexas();
 grafo.imprimirComponentesConexas(Comp_do_Grafo);
 
-cout << "Numero de Componentes Conexas: " << grafo.n_CompConexa << endl;
+std::cout << "Número de Componentes Conexas: " << grafo.n_CompConexa << std::endl;
 
-Exemplo de chamada para um método que você precisa implementar
-grafo.graus(); // Certifique-se de que o método graus() esteja definido
+Chamada para um Método a Ser Implementado
+Certifique-se de que o método graus() esteja definido:
+
+grafo.graus();
+
+Observações
+Preste atenção na importação dos arquivos, pois isso impacta diretamente no uso da biblioteca graph.
+Certifique-se de que todos os arquivos necessários (graph.h, graph.cpp, main.cpp) estão no mesmo diretório antes de compilar.
