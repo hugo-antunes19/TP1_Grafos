@@ -271,3 +271,29 @@ map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> Grafo::Co
 
     return componentesConexas; // Retorna o mapa de componentes
 }
+
+void Grafo::imprimirComponentesConexas(const map<unsigned int, vector<vector<unsigned int>>, std::greater<unsigned int>>& componentesConexas) {
+    if (componentesConexas.empty()) {
+        cout << "Nenhuma componente conexa encontrada." << endl;
+        return;
+    }
+
+    // Itera sobre o map onde a chave é o tamanho da componente
+    for (const auto& par : componentesConexas) {
+        long long tamanho = par.first; // A chave (tamanho da componente)
+        const vector<vector<unsigned int>>& componentes = par.second; // O vetor de componentes conexas de mesmo tamanho
+
+        cout << "Componentes de tamanho " << tamanho << ":" << endl;
+
+        // Itera sobre cada componente conexa (um vetor de vértices)
+        for (const auto& componente : componentes) {
+            cout << "Vértices: ";
+            for (unsigned int vertice : componente) {
+                cout << vertice << " "; // Imprime cada vértice da componente
+            }
+            cout << endl;
+        }
+
+        cout << endl; // Nova linha entre as componentes de mesmo tamanho
+    }
+}
