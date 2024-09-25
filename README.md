@@ -47,6 +47,10 @@ Certifique-se de que o método graus() esteja definido:
 
   ```sh
   grafo.graus();
+   ```
+## Observações
+- Preste atenção na importação dos arquivos, pois isso impacta diretamente no uso da biblioteca graph
+- Certifique-se de que todos os arquivos necessários (graph.h, graph.cpp, main.cpp) estão no mesmo diretório antes de compilar.
 
 
 
