@@ -40,6 +40,7 @@ std::map<unsigned int, std::vector<std::vector<unsigned int>>, std::greater<unsi
 grafo.imprimirComponentesConexas(Comp_do_Grafo);
 
 std::cout << "Número de Componentes Conexas: " << grafo.n_CompConexa << std::endl
+```
 
 ### Chamada para um Método a Ser Implementado
 Certifique-se de que o método graus() esteja definido:
