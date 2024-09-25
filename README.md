@@ -1,4 +1,4 @@
-*Esse é o TP da disciplina de Grafos de 2024.2*
+Esse é o TP da disciplina de Grafos de 2024.2
 Alunos responsáveis: Hugo Antunes e Vivian Souza
 
 O nosso trabalho foi inteiramente feito em c++, sendo separado em 3 arquivos que precisam ser baixados para a devida importação da biblioteca.
