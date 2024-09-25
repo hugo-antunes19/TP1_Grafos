@@ -82,6 +82,17 @@ int main(int argc, char *argv[]) {
     }
     */
 
+    //Exemplo de como calcular e imprimir componentes conexas (código utilizado para obter os resultados dos experimentos)
+
+    /*
+    Grafo grafo(grafo_1.txt, usaMatriz) // o primeiro termo é alterado de acordo com o grafo que se deseja utilizar
+    
+    map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> Comp_do_Grafo = grafo.ComponentesConexas();
+    grafo.imprimirComponentesConexas(Comp_do_Grafo);
+
+    cout << "Numero de Componentes Conexas: " << grafo.n_CompConexa << endl;
+    */
+
     // Exemplo de chamada para um método que você precisa implementar
     grafo.graus(); // Certifique-se de que o método graus() esteja definido
 
