@@ -8,6 +8,7 @@
 #include <sstream>
 #include <queue> 
 #include <chrono>
+#include <algorithm>
 using namespace std;
 
 class Grafo {
@@ -18,19 +19,25 @@ private:
     unsigned int arestas;
     bool usaMatriz;
     vector<bool> visitado;
-    vector<unsigned int> pai;
-    vector<unsigned int> nivel;
+    vector<int> pai;
+    vector<int> nivel;
     unsigned int n_CompConexa; 
 
 public:
     // Construtor
-    Grafo(unsigned int v, bool isMatriz);
+    Grafo(const string &grafo, bool isMatriz);
+
+    // Get vértices
+    unsigned int getVertices();
+
+    // Criar txt
+    void write_general_info(const string &arquivo);
 
     // Métodos
     void adicionarAresta(unsigned int x, unsigned int y);
     
     // Graus de um vértice
-    void graus();
+    tuple<unsigned int, unsigned int, unsigned int, float> graus();
 
     // Imprime a Matriz de Adjacência
     void printMatrizAdj() const;
@@ -39,7 +46,7 @@ public:
     void printListAdj() const;
 
     // Escrever em arquivo (para retornar a árvore gerada por busca)
-    void Write_file_busca(std::vector<unsigned int> pai, std::vector<unsigned int> nivel, const std::string& outputFile, unsigned int s);
+    void Write_file_busca(std::vector<int> pai, std::vector<int> nivel, const std::string& outputFile, unsigned int s);
 
     // Obtém os vizinhos de um vértice na matriz de adjacência
     std::vector<unsigned int> getVizinhosMatriz(unsigned int v) const;
@@ -48,7 +55,7 @@ public:
     int aprox(unsigned int start, const std::string& outputFile, bool write_tree);
 
     // Algoritmo diâmetro não aproximado
-    int diameter(const std::string& outputFile, bool write_tree);
+    int diameter();
 
     // Algoritmo Distância
     int distancia(unsigned int start, const std::string& outputFile, bool write_tree, unsigned int end);
@@ -63,6 +70,6 @@ public:
     std::map<unsigned int, std::vector<std::vector<unsigned int>>, std::greater<unsigned int>> ComponentesConexas();
 
     // Imprimir Componentes Conexas
-    void imprimirComponentesConexas(const map<long long, vector<vector<long long>>, std::greater<long long>>& componentesConexas);
+    void imprimirComponentesConexas(const map<unsigned int, vector<vector<unsigned int>>, std::greater<unsigned int>>& componentesConexas);
 };
 #endif // GRAPH_H
