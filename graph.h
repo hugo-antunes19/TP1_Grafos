@@ -61,6 +61,8 @@ public:
 
     // Componentes Conexas
     std::map<unsigned int, std::vector<std::vector<unsigned int>>, std::greater<unsigned int>> ComponentesConexas();
-};
 
+    // Imprimir Componentes Conexas
+    void imprimirComponentesConexas(const map<long long, vector<vector<long long>>, std::greater<long long>>& componentesConexas);
+};
 #endif // GRAPH_H
