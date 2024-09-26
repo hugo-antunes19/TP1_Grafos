@@ -48,10 +48,12 @@ double media_lista_DFS(int vezes, const string &arquivo){
 int main(int argc, char *argv[]) {
     Grafo grafo("grafo_1.txt",true);
     int d = 0;
+    //distancia entre 2 pontos
     d = grafo.distancia(20,"output.txt",false,30);
     cout << d << endl;
     double acumulado_bfs=0;
     double acumulado_dfs=0;
+    //media os tempos de dfs e bfs 
     for (int i =0;i<101;i++){
 
         unsigned int s = std::rand() % grafo.getVertices();
@@ -72,6 +74,24 @@ int main(int argc, char *argv[]) {
     }
     cout<< std::setprecision(6) << acumulado_bfs/100 << endl;
     cout << std::setprecision(10) << acumulado_dfs/100 << endl;
+
+    // Nome dos arquivos para salvar as árvores de BFS e DFS
+    string treeFile_bfs = "bfs_tree.txt";  
+    string treeFile_dfs = "dfs_tree.txt";
+        
+    grafo.BFS(1,"1" + treeFile_bfs,true);
+    grafo.DFS(1,"1" + treeFile_dfs,true);
+    grafo.BFS(2,"2" + treeFile_bfs,true);
+    grafo.DFS(2,"2" + treeFile_dfs,true);
+    grafo.BFS(3,"3" + treeFile_bfs,true);
+    grafo.DFS(3,"3" + treeFile_dfs,true);
+
+    //achar e imprimir componentes conexas (ordem decrescente) 
+    map<unsigned int, vector<vector<unsigned int>>, greater<unsigned int>> Comp_do_Grafo = grafo.ComponentesConexas();
+    grafo.imprimirComponentesConexas(Comp_do_Grafo);
+    cout << "Numero de Componentes Conexas: " << grafo.n_CompConexa << endl;
+        
+
     return 0;
 }
 
