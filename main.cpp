@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     cout << d << endl;
     double acumulado_bfs=0;
     double acumulado_dfs=0;
-    for (int i =0;i<11;i++){
+    for (int i =0;i<101;i++){
 
         unsigned int s = std::rand() % grafo.getVertices();
         auto inicio = std::chrono::high_resolution_clock::now();
@@ -70,8 +70,8 @@ int main(int argc, char *argv[]) {
         acumulado_dfs= acumulado_dfs + duracao.count();
         std::cout << "Tempo de execução DFS: " << duracao.count() << " segundos" << std::endl;
     }
-    cout<< std::setprecision(6) << acumulado_bfs/10 << endl;
-    cout << std::setprecision(10) << acumulado_dfs/10 << endl;
+    cout<< std::setprecision(6) << acumulado_bfs/100 << endl;
+    cout << std::setprecision(10) << acumulado_dfs/100 << endl;
     return 0;
 }
 
