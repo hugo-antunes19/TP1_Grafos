@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <iomanip>
-#include "graph.h" // Certifique-se de que você tem o cabeçalho correto
+#include "graph.h" 
 using namespace std;
 
 double media_lista_BFS(int vezes, const string &arquivo){
